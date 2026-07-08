@@ -118,6 +118,7 @@ Documentos clave:
 * `docs/process/feature-workflow.md`
 * `docs/testing/test-strategy.md`
 * `docs/architecture/lvgl-integration-spec.md`
+* `docs/testing/local-websocket-test-server-spec.md`
 
 Reglas centrales:
 

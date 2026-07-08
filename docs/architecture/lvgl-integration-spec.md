@@ -115,6 +115,24 @@ El runtime incluye WebSocket como transporte primario del payload externo.
 3. `ws_last_disconnect_reason`
 4. `ws_messages_dropped`
 
+### 6.5 Servidor local de pruebas (obligatorio en desarrollo)
+
+Para desarrollo y validacion offline, la implementacion debe considerar un servidor WebSocket local que permita simular el proveedor externo y enviar comandos al dispositivo.
+
+Requisitos minimos del servidor local:
+
+1. Correr en entorno local sin dependencias cloud.
+2. Aceptar multiples clientes ESP32 simultaneos.
+3. Enviar payloads de control (`CONNECT_ACK`, `PLAYBACK_START`, `PLAYBACK_STOP`, `INTERRUPT`, `PING`).
+4. Inyectar condiciones de red (delay, jitter, desconexion, perdida de mensajes).
+5. Registrar trazas de mensajes con timestamp para debug y replay.
+
+Uso en flujo de desarrollo:
+
+1. Firmware apunta a `ws://<host-local>:<port>` por configuracion.
+2. QA ejecuta escenarios reproducibles desde scripts locales.
+3. CI de integracion puede correr una version mock del servidor.
+
 ## 7. UI state contract (lectura)
 
 Campos sugeridos para render:
@@ -175,6 +193,8 @@ Estos valores son gate de performance y deben medirse por board.
 3. Recovery de UI tras fallo de display driver.
 4. Handshake WebSocket + reconexion con backoff.
 5. Heartbeat y deteccion de timeout de socket.
+6. Compatibilidad con servidor WebSocket local de pruebas.
+7. Inyeccion de comandos desde servidor local y validacion de respuesta del firmware.
 
 ### E2E
 
@@ -182,6 +202,7 @@ Estos valores son gate de performance y deben medirse por board.
 2. Multi-ESP32 con arbitraje first-to-lock visible en UI.
 3. Reconexion de sesion y continuidad de pantalla.
 4. Perdida de WebSocket durante playback y recuperacion segura.
+5. Flujo completo contra servidor local: connect -> comando -> playback -> interrupt.
 
 ### Performance
 
@@ -204,6 +225,7 @@ Estos valores son gate de performance y deben medirse por board.
 1. `runtime_ui_adapter` con no-op renderer.
 2. Cliente WebSocket minimo con reconnect + heartbeat.
 3. Tests de contrato y stress de eventos.
+4. Servidor local mock para pruebas de comandos y reconexion.
 
 ### Fase 2: LVGL minimo
 
