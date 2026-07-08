@@ -24,6 +24,7 @@ Fuera de scope del core:
 Documento oficial de alcance:
 
 * `docs/architecture/scope.md`
+* `docs/architecture/lvgl-integration-spec.md`
 
 ---
 
@@ -116,6 +117,7 @@ Documentos clave:
 * `CONTRIBUTING.md`
 * `docs/process/feature-workflow.md`
 * `docs/testing/test-strategy.md`
+* `docs/architecture/lvgl-integration-spec.md`
 
 Reglas centrales:
 
