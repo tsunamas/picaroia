@@ -13,10 +13,12 @@ El core del proyecto se delimita a:
 1. Firmware para captura/reproduccion de audio (I2S).
 2. HAL para microfono, speaker, servo y perifericos.
 3. Maquina de estados local: idle, listening, speaking, interrupted, error.
-4. Validacion de payload externo (schema, tamano, timeouts).
-5. Manejo de concurrencia multi-ESP32 y arbitraje first-to-lock.
-6. Harness de pruebas serial/I2S con inyeccion de datos sinteticos.
-7. Observabilidad local de latencia, dropouts y eventos de estado.
+4. Transporte WebSocket para recibir/enviar payload externo en tiempo real.
+5. Validacion de payload externo (schema, tamano, timeouts).
+6. Reconexion WebSocket, heartbeat y manejo de desconexion segura.
+7. Manejo de concurrencia multi-ESP32 y arbitraje first-to-lock.
+8. Harness de pruebas serial/I2S con inyeccion de datos sinteticos.
+9. Observabilidad local de latencia, dropouts y eventos de estado.
 
 ## Out of Scope (core)
 
