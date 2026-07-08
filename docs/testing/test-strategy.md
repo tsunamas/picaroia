@@ -36,6 +36,24 @@ Para acelerar debugging y entrenamiento de alumnos, se define un harness con iny
 3. Reproducir secuencias deterministicas para comparar resultados entre ramas.
 4. Guardar reporte de diferencias de latencia y eventos de arbitraje.
 
+## Servidor WebSocket local para pruebas
+
+Para validar el transporte y comandos sin depender de cloud, se debe incluir un servidor WebSocket local de testing.
+
+Cobertura minima esperada:
+
+1. Handshake inicial y registro de dispositivo.
+2. Envio de comandos de control al firmware (playback, stop, interrupt, reconnect).
+3. Heartbeat y timeout con reconexion automatica.
+4. Inyeccion de delay, jitter, desconexion y perdida de paquetes.
+5. Reproduccion de escenarios deterministas desde fixtures.
+
+Salida esperada:
+
+1. Logs de mensajes bidireccionales con timestamp.
+2. Resultado por escenario (pass/fail) y metricas de latencia.
+3. Evidencia reutilizable para PR (artefacto o reporte).
+
 ## Metricas minimas a reportar
 
 - Latencia total de turno de voz (ms).
