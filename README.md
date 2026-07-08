@@ -62,3 +62,41 @@ picaroia/
 ├── backend/          # Servidor Node.js + TypeScript (Orquestador de IA y Seguridad)
 ├── firmware/         # Código C++ para la ESP32 (Manejo de audio local y servos)
 └── hardware/         # Planos, esquemáticos y diseño de carcasas
+```
+
+---
+
+## 🧠 Base de Arquitectura LLM Provider-Agnostic (v0)
+
+Para mantener la libertad de elección de modelos y evitar lock-in por proveedor, el backend inicia con una arquitectura desacoplada:
+
+* **Contrato común de proveedores LLM:** `backend/src/ai/contracts.ts`
+* **Adaptadores por proveedor:** `backend/src/ai/providers/*`
+* **Política de ruteo auditable:** `backend/src/ai/policy.ts`
+* **Guardrails desacoplados (sanitización + moderación):** `backend/src/ai/guardrails.ts`
+* **Orquestación central única:** `backend/src/ai/router.ts`
+
+Documentación de esta base:
+
+* `docs/architecture/provider-agnostic.md`
+* `docs/architecture/foundations.md`
+
+Con esta base, agregar un proveedor nuevo implica solo crear su adapter y registrarlo, sin tocar la lógica de seguridad ni el flujo principal de orquestación.
+
+---
+
+## ✅ Flujo de Trabajo y Calidad para Features
+
+Para mantener calidad consistente en crecimiento colaborativo, el proyecto fija un flujo obligatorio de `branch -> tests -> PR -> merge`.
+
+Documentos clave:
+
+* `CONTRIBUTING.md`
+* `docs/process/feature-workflow.md`
+* `docs/testing/test-strategy.md`
+
+Reglas centrales:
+
+1. Toda feature nueva debe traer tests nuevos.
+2. Todo bugfix debe traer test de regresión.
+3. Ningún PR se mergea sin quality gates en verde (lint, tests, e2e y performance cuando aplique).
