@@ -1,30 +1,51 @@
 # PicaroIA 🦜🤖
 
-¡Bienvenido a **PicaroIA**! Un asistente de voz interactivo, de código abierto y ultra baja latencia diseñado para revolucionar la interacción humana-IA mediante hardware accesible.
+¡Bienvenido a **PicaroIA**! Un runtime de hardware de voz, de código abierto y ultra baja latencia, diseñado para ejecutar interacción local en ESP32 consumiendo un payload externo.
 
-A diferencia de los asistentes tradicionales que sufren de pausas largas, PicaroIA utiliza **WebSockets** y control de flujo directo en el hardware. Esto permite manejar interrupciones de forma quirúrgica: en cuanto el usuario habla, el dispositivo limpia su buffer local y la IA se calla en seco, logrando una experiencia fluida, natural y profesional.
+A diferencia de soluciones monolíticas, PicaroIA separa responsabilidades: el dispositivo resuelve audio, estado e interrupciones en tiempo real; la inteligencia externa solo entrega payloads de entrada/salida mediante contrato versionado.
 
 ---
 
-## 🛡️ Pilares de Seguridad, Privacidad y Mitigación de Mal Uso
+## 🎯 Alcance del Proyecto (Scope V1)
 
-Este proyecto considera la **seguridad y la privacidad como prioridades máximas**. El código base implementa las siguientes trabas y protecciones nativas en el backend para evitar su explotación o mal uso:
+Este repositorio se delimita al **hardware** y su runtime local:
 
-* **Privacidad por Diseño (Cero Almacenamiento):** El flujo de audio se procesa estrictamente en memoria (streaming de bytes) y se desecha inmediatamente después de ser transcrito. El servidor **no almacena grabaciones de voz** por defecto.
-* **Filtros Anti-Prompt Injection:** Sanitización activa de texto previa al envío al LLM, evitando que comandos de voz maliciosos intenten "hackear" o alterar las instrucciones del sistema.
-* **Moderación de Contenido Automatizada:** Todo texto generado por la IA pasa por un pipeline estricto de moderación (ej. OpenAI Moderation API) antes de convertirse en audio, bloqueando en seco cualquier contenido violento, inadecuado o peligroso.
-* **Protección contra Drenado de Créditos (Rate Limiting):** Limitación de solicitudes por IP e identificador de hardware para prevenir ataques de denegación de servicio (DoS) y bucles infinitos de facturación de APIs de pago.
+1. Firmware ESP32 y HAL (micrófono, speaker I2S, servo, botones, leds).
+2. Máquina de estados local para turn-taking e interrupciones.
+3. Contrato de payload externo (entrada/salida) y validación local.
+4. Pruebas de hardware, multi-ESP32 y harness con datos mockeados por cable.
+
+Fuera de scope del core:
+
+1. Orquestación de LLM en la nube.
+2. Moderación cloud, billing, auth o lógica de producto backend.
+3. Dependencia directa de un proveedor específico de IA.
+
+Documento oficial de alcance:
+
+* `docs/architecture/scope.md`
+
+---
+
+## 🛡️ Pilares de Seguridad, Privacidad y Robustez Local
+
+Este proyecto considera la **seguridad y la privacidad como prioridades máximas** en dispositivo. El runtime local aplica las siguientes protecciones:
+
+* **Privacidad por Diseño (Cero Almacenamiento):** El audio se procesa en memoria y se descarta al terminar cada ciclo.
+* **Validación Estricta de Payloads:** Todo payload externo debe cumplir esquema y límites de tamaño/tiempo.
+* **Control de Fallos Local:** Watchdog, límites de cola y manejo de reconexiones para evitar estados colgados.
+* **Identidad de Dispositivo Acotada:** Uso de identificadores seudónimos y mínimo metadata para operación.
 
 ---
 
 ## 👥 Ecosistema Multi-Compañero y Accesibilidad Económica
 
-PicaroIA permite conectar dos o más dispositivos físicos dentro de una misma "Sala de WebSockets" administrada centralmente por el backend, abriendo una puerta gigantesca a la accesibilidad cognitiva y social por **menos de $25 USD en total**.
+PicaroIA permite conectar dos o más dispositivos físicos dentro de una misma sala de interacción, abriendo una puerta gigante a la accesibilidad cognitiva y social por **menos de $25 USD en total**.
 
 Para resolver el solapamiento de audio en la misma habitación (evitando el eco o bucles infinitos de procesamiento), implementamos un **Algoritmo de Arbitraje de Micrófono por Software (First-to-Lock):**
 1. **Alerta Activa:** Todos los dispositivos de la sala escuchan en paralelo.
-2. **Bloqueo por Velocidad (First-to-Lock):** El niño habla y el backend selecciona el primer paquete de audio que llegue con éxito (el micrófono con mejor señal o cercanía). En ese microsegundo, bloquea la sala para ese dispositivo y descarta el audio redundante de los demás.
-3. **Inhibición Cruzada:** Mientras un compañero reproduce la respuesta de la IA a través de su altavoz, el backend ignora temporalmente la entrada de todos los micrófonos de la sala, eliminando la necesidad de hardware caro de cancelación de eco.
+2. **Bloqueo por Velocidad (First-to-Lock):** El runtime selecciona el primer stream de audio válido y descarta redundancia de los demás dispositivos.
+3. **Inhibición Cruzada:** Mientras un compañero reproduce audio, se inhibe temporalmente la captura de los micrófonos del resto para evitar bucles.
 
 ---
 
@@ -59,35 +80,36 @@ Gracias a nuestra Capa de Abstracción de Hardware (HAL), puedes elegir el camin
 
 ```text
 picaroia/
-├── backend/          # Servidor Node.js + TypeScript (Orquestador de IA y Seguridad)
-├── firmware/         # Código C++ para la ESP32 (Manejo de audio local y servos)
-└── hardware/         # Planos, esquemáticos y diseño de carcasas
+├── firmware/         # Código C++ para la ESP32 (runtime local, audio y servos)
+├── hardware/         # Planos, esquemáticos y diseño de carcasas
+├── docs/             # Alcance, proceso y estrategia de pruebas
+└── backend/          # Referencias/harness de integración (no core de producto)
 ```
 
 ---
 
-## 🧠 Base de Arquitectura LLM Provider-Agnostic (v0)
+## 🔌 Contrato de Payload Externo (v1)
 
-Para mantener la libertad de elección de modelos y evitar lock-in por proveedor, el backend inicia con una arquitectura desacoplada:
+El core del dispositivo solo consume/produce payloads versionados. El proveedor externo (backend, orquestador o LLM gateway) es intercambiable.
 
-* **Contrato común de proveedores LLM:** `backend/src/ai/contracts.ts`
-* **Adaptadores por proveedor:** `backend/src/ai/providers/*`
-* **Política de ruteo auditable:** `backend/src/ai/policy.ts`
-* **Guardrails desacoplados (sanitización + moderación):** `backend/src/ai/guardrails.ts`
-* **Orquestación central única:** `backend/src/ai/router.ts`
+Campos clave esperados:
 
-Documentación de esta base:
+1. `schema_version`
+2. `session_id` y `device_id`
+3. `command` o `audio/text payload`
+4. Metadatos de control de latencia e interrupción
 
-* `docs/architecture/provider-agnostic.md`
-* `docs/architecture/foundations.md`
+Reglas:
 
-Con esta base, agregar un proveedor nuevo implica solo crear su adapter y registrarlo, sin tocar la lógica de seguridad ni el flujo principal de orquestación.
+1. Si el payload no valida, se rechaza de forma segura.
+2. El runtime no depende de APIs propietarias para funcionar.
+3. El contrato se versiona y se mantiene compatibilidad hacia atrás cuando sea posible.
 
 ---
 
 ## ✅ Flujo de Trabajo y Calidad para Features
 
-Para mantener calidad consistente en crecimiento colaborativo, el proyecto fija un flujo obligatorio de `branch -> tests -> PR -> merge`.
+Para mantener calidad consistente en crecimiento colaborativo, el proyecto fija un flujo obligatorio de `branch -> tests -> PR -> merge`, con control estricto de alcance hardware-first.
 
 Documentos clave:
 
