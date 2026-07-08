@@ -13,10 +13,17 @@ Describe brevemente el cambio y su objetivo.
 
 ## Scope
 
-- [ ] Backend
-- [ ] Firmware
-- [ ] Hardware
+- [ ] Firmware (core)
+- [ ] Hardware (core)
+- [ ] Contrato de payload externo (core)
+- [ ] Backend/Cloud (solo soporte o harness, no core)
 - [ ] Infra/CI
+
+## Scope Gate (obligatorio)
+
+- [ ] Este cambio mejora hardware/runtime local.
+- [ ] Este cambio define o respeta un payload externo versionado.
+- [ ] Este cambio NO acopla el core a un proveedor cloud/LLM especifico.
 
 ## Quality Gates (obligatorio)
 

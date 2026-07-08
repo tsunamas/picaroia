@@ -1,5 +1,13 @@
 # Feature Workflow (Branch -> PR -> Merge)
 
+## 0) Validar alcance
+
+Antes de tocar codigo, confirmar:
+
+1. El cambio aporta al runtime de hardware o al contrato de payload.
+2. El cambio no acopla el core a un proveedor cloud.
+3. Si algo cloud es necesario, va en capa externa de soporte.
+
 ## 1) Crear branch desde main
 
 ```bash
@@ -34,7 +42,8 @@ Checklist minimo:
 2. Que cambia y que no cambia.
 3. Riesgos y mitigaciones.
 4. Evidencia de tests (salidas, logs, capturas cuando aplique).
-5. Impacto en costo/latencia si toca IA en tiempo real.
+5. Impacto en latencia/estabilidad del runtime local.
+6. Confirmacion de Scope Gate.
 
 ## 5) Merge
 

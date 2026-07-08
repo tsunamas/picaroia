@@ -1,50 +1,51 @@
-# Project Foundations To Set Early
+# Project Foundations (Hardware-First)
 
-## 1) Runtime boundaries
+## 1) Scope boundaries
 
-- Define hard boundaries between `backend`, `firmware`, and `hardware`.
-- Enforce API contracts between firmware and backend (versioned messages).
+- Core = firmware + hardware + payload contract.
+- Cloud/backends are external integrations, not core runtime.
+- Every module must declare whether it is core or support tooling.
 
-## 2) Security baseline (already started)
+## 2) Runtime architecture baseline
 
-- Prompt-injection sanitizer with test vectors.
-- Input/output moderation pipeline.
-- Rate limits per IP and device id.
-- Secrets policy: no secrets in repo, only env vars.
+- Deterministic state machine for turn-taking and interruptions.
+- HAL abstraction for audio, servo and GPIO peripherals.
+- Transport abstraction for payload ingestion (WebSocket, serial, others).
 
-## 3) LLM freedom and portability
+## 3) Payload contract baseline
 
-- Provider-agnostic interface.
-- Vendor adapters as plugins.
-- Routing policy independent from provider SDKs.
-- Fallback strategy by cost/latency/availability.
+- Versioned schema with backward compatibility policy.
+- Strict validation at runtime entrypoint.
+- Explicit limits for payload size, frequency and timeout.
 
-## 4) Observability baseline
+## 4) Security and privacy baseline
 
-- Structured logs with request ids and room ids.
-- Core metrics: STT latency, LLM latency, TTS latency, drop/interruption counts.
-- Error taxonomy with actionable categories.
+- Zero-audio-storage by default.
+- Minimal metadata collection and pseudonymous device ids.
+- Input validation and fail-safe rejection paths.
 
 ## 5) Reliability baseline
 
-- Idempotent handling for reconnects and duplicate websocket frames.
-- Backpressure handling and bounded queues.
-- Circuit breakers for provider failures.
+- Idempotent reconnect behavior.
+- Bounded queues and backpressure handling.
+- Watchdog and recovery strategy for deadlocks.
 
-## 6) Data and privacy baseline
+## 6) Observability baseline
 
-- Explicit retention policy (default: zero audio storage).
-- Configurable redaction for transcripts in logs.
-- Pseudonymous device identifiers.
+- Structured events for state transitions.
+- Metrics: capture latency, playback latency, interruption time, dropouts.
+- Error taxonomy focused on actionable hardware/runtime failures.
 
-## 7) Contribution baseline
+## 7) Testing baseline
 
-- ADRs for architecture decisions.
-- Definition of done requiring tests + docs updates.
-- Minimal CI: lint, typecheck, unit tests.
+- Unit tests for state machine and validators.
+- Integration tests for transport + runtime interactions.
+- E2E scenarios for multi-device arbitration.
+- Performance tests with thresholds for latency regressions.
+- Cable-based mock data harness for reproducible classroom/lab setups.
 
-## 8) Domain baseline for voice UX
+## 8) Contribution baseline
 
-- Turn-taking state machine (listening, speaking, interrupted, idle).
-- First-to-lock arbitration as a deterministic module with tests.
-- Echo suppression behavior specified and validated in integration tests.
+- Scope gate required in every PR.
+- Feature requires new tests; bugfix requires regression test.
+- Docs update required whenever payload contract or behavior changes.
