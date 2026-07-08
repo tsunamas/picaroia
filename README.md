@@ -59,7 +59,7 @@ Gracias a nuestra Capa de Abstracción de Hardware (HAL), puedes elegir el camin
 * **Ventajas:** Mini altavoz inteligente listo para usar con carcasa, chip ESP32, micrófono digital y altavoz integrado.
 
 ### Opción B: DIY Personalizada (Para peluches o juguetes con movimiento)
-* **Componentes:** ESP32-WROOM-32E, Micrófono Digital INMP441 (I2S), Amplificador DAC MAX98357A (I2S), Mini Bocina (8 Ohms) y un **Servomotor SG90/MG90S** para controlar la apertura física de la boca en sincronía con la voz.
+* **Componentes:** ESP32-WROOM-32E, Micrófono Digital INMP441 (I2S), Amplificador DAC MAX98357A (I2S), Mini Bocina (8 Ohms) y un **actuador lineal/micro-servo** para hacer que el Indio Pícaro "se pare" durante la interacción.
 
 ---
 
@@ -72,7 +72,11 @@ Gracias a nuestra Capa de Abstracción de Hardware (HAL), puedes elegir el camin
 | **SD / DIN** (Datos) | SD (Data Out) | *No conectar* | **GPIO 32** (Entrada) |
 | **DIN** (Datos) | *No conectar* | DIN (Data In) | **GPIO 22** (Salida) |
 
-* **Servomotor (Boca):** Señal ➡️ **GPIO 13** | VCC ➡️ **5V** | GND ➡️ **GND**
+* **Actuador (Postura del Indio Pícaro):** Señal ➡️ **GPIO 13** | VCC ➡️ **5V** | GND ➡️ **GND**
+* **Posiciones sugeridas del actuador:**
+	* **Baja (reposo):** posición por defecto cuando no hay habla.
+	* **50% (interacción):** extensión al 50% mientras el dispositivo habla o hace preguntas que requieren respuesta del usuario.
+	* **Límite de seguridad:** el actuador no debe superar el 50% de recorrido en ningún estado.
 * *Configuración:* Soldar pin **L/R** del Mic a **GND**. Dejar pines **GAIN** y **SD** del Amp sueltos.
 
 ---
